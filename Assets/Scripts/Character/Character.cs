@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Character : MonoBehaviour
@@ -44,12 +45,15 @@ public class Character : MonoBehaviour
     [HideInInspector]
     public Vector3 playerVelocity;
 
+    private PlayerStatsController statsController;
     private void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         playerInput = GetComponent<PlayerInput>();
         cameraTransform = Camera.main.transform;
+
+     
 
         movementSM = new StateMachine();
         standing = new StandingState(this, movementSM);
@@ -63,6 +67,15 @@ public class Character : MonoBehaviour
 
         normalColliderHeight = controller.height;
         gravityValue *= gravityMultiplier;
+
+        statsController = GetComponent<PlayerStatsController>();
+        if (statsController == null)
+        {
+            Debug.LogError("GamePauseManager: PlayerStatsController not found!");
+        }
+
+
+
     }
 
     private void Update()
@@ -70,10 +83,23 @@ public class Character : MonoBehaviour
         movementSM.currentState.HandleInput();
 
         movementSM.currentState.LogicUpdate();
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (statsController != null)
+            {
+                statsController.SaveAll();
+                SceneManager.LoadScene("MainMenu");
+            }
+        }
+
+
     }
 
     private void FixedUpdate()
     {
         movementSM.currentState.PhysicsUpdate();
     }
+
+   
+
 }

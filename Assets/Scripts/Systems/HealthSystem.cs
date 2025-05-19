@@ -10,9 +10,20 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] GameObject restartMenu;
 
     Animator animator;
+    private PlayerStatsController statsController;
     void Start()
     {
         animator = GetComponent<Animator>();
+        statsController = FindObjectOfType<PlayerStatsController>();
+
+        if (statsController != null)
+        {
+            health = statsController.GetCurrentHP();
+        }
+        else
+        {
+            Debug.LogWarning("HealthSystem: statsController или его данные не готовы!");
+        }
     }
 
     public void TakeDamage(float damageAmount)
@@ -20,6 +31,12 @@ public class HealthSystem : MonoBehaviour
         health -= damageAmount;
         animator.SetTrigger("damage");
         Debug.Log(health);
+
+        if (statsController != null)
+        {
+            statsController.SetCurrentHP(health);
+        }
+
         if (health <= 0)
         {
             Die();
@@ -42,4 +59,6 @@ public class HealthSystem : MonoBehaviour
         Destroy(hit, 3f);
 
     }
+    
+
 }

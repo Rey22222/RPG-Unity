@@ -8,6 +8,10 @@ public class MainMenu : MonoBehaviour
 
     public AudioClip clip;
     public AudioSource musicSource;
+
+    [SerializeField] private PlayerStatsController statsController;
+    [SerializeField] private string menuSceneName = "MainMenu";
+
     void Start()
     {
         if (slider != null && musicSource != null)
@@ -16,17 +20,55 @@ public class MainMenu : MonoBehaviour
             musicSource.volume = slider.value;
         }
     }
-    public void PlayGame()
+
+    void Update()
     {
-        SceneManager.LoadScene("Demo");
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SaveAndLoadMenu();
+        }
     }
 
-    // Update is called once per frame
+    void SaveAndLoadMenu()
+    {
+        if (statsController != null && statsController.IsReady())
+        {
+            statsController.SavePosition(statsController.transform.position);
+            statsController.SaveHPMP();
+        }
+        else
+        {
+            Debug.LogWarning("MenuManager: statsController not ready.");
+        }
+
+        SceneManager.LoadScene(menuSceneName);
+    }
+    
+
+   
     public void QuitGame()
     {
         Debug.Log("Quit");
         Application.Quit();
     }
+
+    public void OnLoadGame()
+    {
+        PlayerPrefs.SetInt("LoadFromSave", 1);
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("Demo");
+    }
+
+
+    public void OnNewGame()
+    {
+        PlayerPrefs.SetInt("LoadFromSave", 0);
+        PlayerPrefs.DeleteKey("PlayerStats");  
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("Demo");
+    }
+
+
 
     public void SetVolume(float value)
     {
@@ -36,4 +78,5 @@ public class MainMenu : MonoBehaviour
             Debug.Log("Volume set to: " + value);
         }
     }
+
 }

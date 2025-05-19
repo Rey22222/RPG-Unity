@@ -5140,7 +5140,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 477418847}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.020382237, y: 0.0047842553, z: 0.00009753521, w: 0.99978083}
+  m_LocalRotation: {x: -0.020382237, y: 0.0047842558, z: 0.000097535216, w: 0.99978083}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5219,7 +5219,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 482223935}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0022413996, y: 0.0047852206, z: 0.000010725742, w: 0.99998605}
+  m_LocalRotation: {x: -0.0022413996, y: 0.004785219, z: 0.000010725738, w: 0.99998605}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5880,6 +5880,8 @@ GameObject:
   - component: {fileID: 540417624}
   - component: {fileID: 540417629}
   - component: {fileID: 540417630}
+  - component: {fileID: 540417631}
+  - component: {fileID: 540417632}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -6039,6 +6041,36 @@ MonoBehaviour:
   health: 10
   hitVFX: {fileID: 0}
   restartMenu: {fileID: 1940856602}
+--- !u!114 &540417631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540417623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44a39eec03a842945862c0200c0c02b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 540417623}
+--- !u!114 &540417632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540417623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ac1c7270aca67740bafcf10af2feead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 0}
+  clip: {fileID: 0}
+  musicSource: {fileID: 0}
+  statsController: {fileID: 540417631}
+  menuSceneName: MainMenu
 --- !u!1001 &541023329
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26091,7 +26123,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1317679951950935180}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0022413998, y: 0.0047852225, z: 0.000010725756, w: 0.99998605}
+  m_LocalRotation: {x: -0.0022413998, y: 0.0047852197, z: 0.000010725756, w: 0.99998605}
   m_LocalPosition: {x: 0.008254627, y: 2.5, z: -4.995753}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
