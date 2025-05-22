@@ -20,7 +20,7 @@ public class DamageDealer : MonoBehaviour
 
     void Update()
     {
-        int layerMask = (1 << 9) | (1 << 10);
+        int layerMask = (1 << 9) | (1 << 10) | (1 << 11);
         if (canDealDamage)
         {
             RaycastHit hit;

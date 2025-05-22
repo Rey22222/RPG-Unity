@@ -8,6 +8,7 @@ public class MainMenu : MonoBehaviour
 
     public AudioClip clip;
     public AudioSource musicSource;
+<<<<<<< Updated upstream
     void Start()
     {
         if (slider != null && musicSource != null)
@@ -19,6 +20,20 @@ public class MainMenu : MonoBehaviour
     public void PlayGame()
     {
         SceneManager.LoadScene("Demo");
+=======
+
+    [SerializeField] private PlayerStatsController statsController;
+    [SerializeField] private string menuSceneName = "MainMenu";
+
+
+    void Update()
+    {
+        Debug.Log(slider.value);
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SaveAndLoadMenu();
+        }
+>>>>>>> Stashed changes
     }
 
     // Update is called once per frame
@@ -28,6 +43,7 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
+<<<<<<< Updated upstream
     public void SetVolume(float value)
     {
         if (musicSource != null)
@@ -36,4 +52,22 @@ public class MainMenu : MonoBehaviour
             Debug.Log("Volume set to: " + value);
         }
     }
+=======
+    public void OnLoadGame()
+    {
+        PlayerPrefs.SetInt("LoadFromSave", 1);
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("Demo");
+    }
+
+
+    public void OnNewGame()
+    {
+        PlayerPrefs.SetInt("LoadFromSave", 0);
+        PlayerPrefs.DeleteKey("PlayerStats");  
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("Demo");
+    }
+
+>>>>>>> Stashed changes
 }

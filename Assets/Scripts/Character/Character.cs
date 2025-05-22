@@ -63,6 +63,16 @@ public class Character : MonoBehaviour
 
         normalColliderHeight = controller.height;
         gravityValue *= gravityMultiplier;
+<<<<<<< Updated upstream
+=======
+
+        statsController = GetComponent<PlayerStatsController>();
+        if (statsController == null)
+        {
+            Debug.LogError("GamePauseManager: PlayerStatsController not found!");
+        }
+
+>>>>>>> Stashed changes
     }
 
     private void Update()
