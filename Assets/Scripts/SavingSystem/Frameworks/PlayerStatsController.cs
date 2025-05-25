@@ -49,7 +49,7 @@ public class PlayerStatsController : MonoBehaviour
 
     private PlayerStats CreateNewStats()
     {
-        return new PlayerStats(100, 50, 5f, 8f, Vector3.zero);
+        return new PlayerStats(200, 50, 5f, 8f, Vector3.zero);
     }
     public GameObject player;
 
@@ -78,7 +78,7 @@ public class PlayerStatsController : MonoBehaviour
         if (_stats == null)
         {
             
-            return 100; 
+            return 200; 
         }
 
         return _stats.CurrentHP;

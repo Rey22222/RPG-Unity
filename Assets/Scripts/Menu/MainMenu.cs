@@ -8,10 +8,7 @@ public class MainMenu : MonoBehaviour
 
     public AudioClip clip;
     public AudioSource musicSource;
-
-    [SerializeField] private PlayerStatsController statsController;
-    [SerializeField] private string menuSceneName = "MainMenu";
-
+<<<<<<< Updated upstream
     void Start()
     {
         if (slider != null && musicSource != null)
@@ -20,38 +17,42 @@ public class MainMenu : MonoBehaviour
             musicSource.volume = slider.value;
         }
     }
+    public void PlayGame()
+    {
+        SceneManager.LoadScene("Demo");
+=======
+
+    [SerializeField] private PlayerStatsController statsController;
+    [SerializeField] private string menuSceneName = "MainMenu";
+
 
     void Update()
     {
+        Debug.Log(slider.value);
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             SaveAndLoadMenu();
         }
+>>>>>>> Stashed changes
     }
 
-    void SaveAndLoadMenu()
-    {
-        if (statsController != null && statsController.IsReady())
-        {
-            statsController.SavePosition(statsController.transform.position);
-            statsController.SaveHPMP();
-        }
-        else
-        {
-            Debug.LogWarning("MenuManager: statsController not ready.");
-        }
-
-        SceneManager.LoadScene(menuSceneName);
-    }
-    
-
-   
+    // Update is called once per frame
     public void QuitGame()
     {
         Debug.Log("Quit");
         Application.Quit();
     }
 
+<<<<<<< Updated upstream
+    public void SetVolume(float value)
+    {
+        if (musicSource != null)
+        {
+            musicSource.volume = value;
+            Debug.Log("Volume set to: " + value);
+        }
+    }
+=======
     public void OnLoadGame()
     {
         PlayerPrefs.SetInt("LoadFromSave", 1);
@@ -68,15 +69,5 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("Demo");
     }
 
-
-
-    public void SetVolume(float value)
-    {
-        if (musicSource != null)
-        {
-            musicSource.volume = value;
-            Debug.Log("Volume set to: " + value);
-        }
-    }
-
+>>>>>>> Stashed changes
 }

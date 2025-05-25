@@ -12,12 +12,12 @@ public class PlayerPrefsRepository : IPlayerStatsRepository
         if (string.IsNullOrEmpty(json) || json == "{}")
         {
            
-            return new PlayerStats(100, 50, 5f, 8f, new Vector3(0, 0, 0));
+            return new PlayerStats(200, 50, 5f, 8f, new Vector3(0, 0, 0));
         }
 
         var stats = JsonConvert.DeserializeObject<PlayerStats>(json);
         if (stats == null)
-            stats = new PlayerStats(100, 50, 5f, 8f, new Vector3(0, 0, 0));
+            stats = new PlayerStats(200, 50, 5f, 8f, new Vector3(0, 0, 0));
 
         Debug.Log("Loaded PlayerStats JSON: " + json);
         Debug.Log($"Position loaded: x={stats.Position.x}, y={stats.Position.y}, z={stats.Position.z}");
