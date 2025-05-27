@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public class SprintState : State
 {
     float gravityValue;
@@ -9,10 +10,20 @@ public class SprintState : State
     float playerSpeed;
     bool jump;
     Vector3 cVelocity;
+
+    private Vector3 forcedRunDirection = Vector3.zero; // направление принудительного бега
+    private bool isForcedRun = false; // флаг принудительного бега
+
     public SprintState(Character _character, StateMachine _stateMachine) : base(_character, _stateMachine)
     {
         character = _character;
         stateMachine = _stateMachine;
+    }
+
+    public void SetRunDirection(Vector3 direction)
+    {
+        forcedRunDirection = direction.normalized;
+        isForcedRun = true;
     }
 
     public override void Enter()
@@ -33,12 +44,22 @@ public class SprintState : State
 
     public override void HandleInput()
     {
-        base.Enter();
+        if (isForcedRun)
+        {
+            // Отключаем управление игроком при принудительном беге
+            sprint = true;
+            jump = false;
+            velocity = forcedRunDirection;
+            return;
+        }
+
+        // Иначе обычный ввод
         input = moveAction.ReadValue<Vector2>();
         velocity = new Vector3(input.x, 0, input.y);
 
         velocity = velocity.x * character.cameraTransform.right.normalized + velocity.z * character.cameraTransform.forward.normalized;
         velocity.y = 0f;
+
         if (sprintAction.triggered || input.sqrMagnitude == 0f)
         {
             sprint = false;
@@ -47,19 +68,18 @@ public class SprintState : State
         {
             sprint = true;
         }
+
         if (jumpAction.triggered)
         {
             jump = true;
-
         }
-
     }
 
     public override void LogicUpdate()
     {
         if (sprint)
         {
-            character.animator.SetFloat("speed", input.magnitude + 1f, character.speedDampTime, Time.deltaTime);
+            character.animator.SetFloat("speed", velocity.magnitude + 1f, character.speedDampTime, Time.deltaTime);
         }
         else
         {
@@ -80,14 +100,21 @@ public class SprintState : State
         {
             gravityVelocity.y = 0f;
         }
+
         currentVelocity = Vector3.SmoothDamp(currentVelocity, velocity, ref cVelocity, character.velocityDampTime);
 
         character.controller.Move(currentVelocity * Time.deltaTime * playerSpeed + gravityVelocity * Time.deltaTime);
-
 
         if (velocity.sqrMagnitude > 0)
         {
             character.transform.rotation = Quaternion.Slerp(character.transform.rotation, Quaternion.LookRotation(velocity), character.rotationDampTime);
         }
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        isForcedRun = false;
+        forcedRunDirection = Vector3.zero;
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,6 +14,12 @@ public class RangedEnemy : MonoBehaviour, IDamageable
     [SerializeField] float attackRange = 8f;
     [SerializeField] float aggroRange = 15f;
 
+    [Header("Element Effect Prefabs")]
+    [SerializeField] private GameObject iceEffectPrefab;
+    [SerializeField] private GameObject fireEffectPrefab;
+    [SerializeField] private GameObject earthEffectPrefab;
+    [SerializeField] private GameObject windEffectPrefab;
+
     GameObject player;
     NavMeshAgent agent;
     Animator animator;
@@ -21,14 +27,19 @@ public class RangedEnemy : MonoBehaviour, IDamageable
     float newDestinationCD = 0.5f;
     bool isPlayerInRange;
     bool isAttacking;
+    private bool isAggroed = false;
 
     HealthSystem playerHealth;
+
+    public ElementType elementType; 
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         player = GameObject.Find("Player");
+        isAggroed = false;
+        timePassed = attackCD;
 
         if (player != null)
         {
@@ -39,6 +50,7 @@ public class RangedEnemy : MonoBehaviour, IDamageable
     void Update()
     {
         animator.SetFloat("speed", agent.velocity.magnitude / agent.speed);
+
         if (player == null || playerHealth == null || playerHealth.IsDead)
         {
             if (isAttacking)
@@ -54,7 +66,7 @@ public class RangedEnemy : MonoBehaviour, IDamageable
 
         float distance = Vector3.Distance(player.transform.position, transform.position);
 
-        if (distance <= aggroRange)
+        if (isAggroed && distance <= aggroRange)
         {
             isPlayerInRange = true;
 
@@ -83,20 +95,22 @@ public class RangedEnemy : MonoBehaviour, IDamageable
                     }
                 }
             }
+
+            timePassed += Time.deltaTime;
         }
         else
         {
             isPlayerInRange = false;
             agent.isStopped = true;
         }
-
-        timePassed += Time.deltaTime;
     }
 
     public void TakeDamage(float amount)
     {
         health -= amount;
         animator.SetTrigger("damage");
+
+        isAggroed = true;
 
         if (health <= 0)
         {
@@ -111,18 +125,41 @@ public class RangedEnemy : MonoBehaviour, IDamageable
 
     public void FireProjectile()
     {
+        if (!isAggroed) return;
         if (player == null || playerHealth == null || playerHealth.IsDead)
             return;
 
         if (projectilePrefab == null || projectileSpawnPoint == null)
         {
-            Debug.LogWarning("Missing projectile reference!");
             return;
         }
 
         Vector3 direction = (player.transform.position - projectileSpawnPoint.position).normalized;
         GameObject proj = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.LookRotation(direction));
-        proj.GetComponent<Projectile>().Initialize(direction);
+
+        Projectile projectileComponent = proj.GetComponent<Projectile>();
+        if (projectileComponent != null)
+        {
+            GameObject effectPrefab = GetEffectPrefabByElement(elementType);
+            projectileComponent.Initialize(direction, elementType, effectPrefab);
+        }
+    }
+
+    private GameObject GetEffectPrefabByElement(ElementType element)
+    {
+        switch (element)
+        {
+            case ElementType.Ice:
+                return iceEffectPrefab;
+            case ElementType.Fire:
+                return fireEffectPrefab;
+            case ElementType.Earth:
+                return earthEffectPrefab;
+            case ElementType.Wind:
+                return windEffectPrefab;
+            default:
+                return null;
+        }
     }
 
     public void EndAttack()
@@ -138,4 +175,3 @@ public class RangedEnemy : MonoBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, aggroRange);
     }
 }
-

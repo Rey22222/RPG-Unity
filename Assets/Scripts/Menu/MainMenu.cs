@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,13 +9,13 @@ public class MainMenu : MonoBehaviour
 
     public AudioClip clip;
     public AudioSource musicSource;
+
+    [SerializeField] private Button playButton;
+    [SerializeField] private Button loadButton;
+    [SerializeField] private string gameScene = "Demo";
     void Start()
     {
-        if (slider != null && musicSource != null)
-        {
-            // Установим начальную громкость
-            musicSource.volume = slider.value;
-        }
+        
     }
     public void PlayGame()
     {
@@ -36,4 +37,8 @@ public class MainMenu : MonoBehaviour
             Debug.Log("Volume set to: " + value);
         }
     }
+
+   
+
+    
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -7,11 +6,29 @@ public class Projectile : MonoBehaviour
     [SerializeField] float damage = 5f;
     [SerializeField] float lifetime = 5f;
 
-    Vector3 direction;
+    private Vector3 direction;
+    private GameObject activeEffectInstance;
+    private ElementType elementType;
+   
 
-    public void Initialize(Vector3 dir)
+    public void Initialize(Vector3 dir, ElementType element, GameObject effectPrefab)
     {
         direction = dir;
+        elementType = element;
+
+        if (effectPrefab != null)
+        {
+            activeEffectInstance = Instantiate(effectPrefab, transform);
+            activeEffectInstance.transform.localPosition = Vector3.zero;
+
+            ParticleSystem ps = activeEffectInstance.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Play();
+                
+            }
+        }
+
         Destroy(gameObject, lifetime);
     }
 
@@ -28,6 +45,13 @@ public class Projectile : MonoBehaviour
             {
                 health.TakeDamage(damage);
             }
+
+            if (other.TryGetComponent(out ElementEffects playerElementEffects))
+            {
+                playerElementEffects.currentElement = elementType;
+                playerElementEffects.ApplyElementEffect();
+            }
+
             Destroy(gameObject);
         }
         else if (!other.isTrigger)
