@@ -5,44 +5,65 @@ using UnityEngine.UI;
 public class Enemy : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
-    public float health = 15;
-    public float maxHealth = 15;
+    [SerializeField] private float health = 15;
+    [SerializeField] private float maxHealth = 15;
 
     [Header("Combat")]
-    public float attackCD = 3f;
-    public float attackRange = 1.5f;
-    public float aggroRange = 4f;
-    public float dieScores = 7f;
+    [SerializeField] private float attackCD = 3f;
+    [SerializeField] private float attackRange = 2f;
+    [SerializeField] private float aggroRange = 4f;
+    [SerializeField] private float fleeDistance = 7f;
+    [SerializeField] private float dieScores = 7f;
+
+    [Header("Flee Behavior")]
+    [SerializeField] private float fleeDuration = 8f;
+    private float fleeTimer = 0f;
+
+    [SerializeField] private GameObject hitVFX;
+    [SerializeField] private GameObject ragdoll;
 
     [Header("UI")]
     public Image Bar;
     public float fill;
     public bool IsFleeing => hasFled;
 
-    [HideInInspector] public GameObject player;
-    [HideInInspector] public HealthSystem playerHealth;
-    [HideInInspector] public NavMeshAgent agent;
-    [HideInInspector] public Animator animator;
-
-    private IEnemyState currentState;
-    public float attackTimer;
-    public float destinationTimer;
-
     private bool hasFled = false;
+    private bool isAggroed = false;
+
+    private GameObject player;
+    private HealthSystem playerHealth;
+    private NavMeshAgent agent;
+    private Animator animator;
+
+    private float attackTimer;
+    private float destinationTimer;
+
+    private EnemyState currentState = EnemyState.Idle;
+    private EnemyState previousState = EnemyState.Idle;
+
+    private Vector3 fleeTargetPosition;
+    private bool hasFleeTarget = false;
+
+    private enum EnemyState { Idle, Chase, Attack, Flee }
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         playerHealth = player.GetComponent<HealthSystem>();
+
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+
         fill = 1f;
-        ChangeState(new IdleStateEnemy(this));
+
+        Debug.Log("[Enemy] Started with health: " + health);
     }
 
     void Update()
     {
-        Bar.fillAmount = health / maxHealth;
+        if (Bar != null)
+            Bar.fillAmount = health / maxHealth;
+
         if (player == null || playerHealth == null || playerHealth.IsDead)
         {
             agent.isStopped = true;
@@ -51,20 +72,147 @@ public class Enemy : MonoBehaviour, IDamageable
         }
 
         animator.SetFloat("speed", agent.velocity.magnitude / agent.speed);
+
         if (!hasFled && health < maxHealth / 2f)
         {
             hasFled = true;
-            ChangeState(new FleeState(this));
+            currentState = EnemyState.Flee;
         }
 
-        currentState?.Update();
+        UpdateState();
+        ExecuteState();
+
+        attackTimer += Time.deltaTime;
     }
 
-    public void ChangeState(IEnemyState newState)
+    void UpdateState()
     {
-        currentState?.Exit();
-        currentState = newState;
-        currentState?.Enter();
+        if (health <= 0)
+        {
+            currentState = EnemyState.Idle;
+            return;
+        }
+
+        if (health < 10f && currentState != EnemyState.Flee)
+        {
+            currentState = EnemyState.Flee;
+            return;
+        }
+
+        if (!isAggroed)
+        {
+            currentState = EnemyState.Idle;
+            return;
+        }
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+        if (distanceToPlayer <= attackRange)
+        {
+            currentState = EnemyState.Attack;
+        }
+        else if (distanceToPlayer <= aggroRange)
+        {
+            currentState = EnemyState.Chase;
+        }
+        else
+        {
+            currentState = EnemyState.Idle;
+        }
+    }
+
+    void ExecuteState()
+    {
+        if (currentState != previousState)
+        {
+            OnStateEnter(currentState);
+            previousState = currentState;
+        }
+
+        switch (currentState)
+        {
+            case EnemyState.Idle:
+                agent.isStopped = true;
+                hasFleeTarget = false;
+                break;
+
+            case EnemyState.Chase:
+                agent.isStopped = false;
+                hasFleeTarget = false;
+                agent.SetDestination(player.transform.position);
+                break;
+
+            case EnemyState.Attack:
+                agent.isStopped = true;
+                hasFleeTarget = false;
+                if (attackTimer >= attackCD)
+                {
+                    animator.SetTrigger("attack");
+                    attackTimer = 0f;
+                }
+                break;
+
+            case EnemyState.Flee:
+                Flee();
+                break;
+        }
+    }
+
+    void OnStateEnter(EnemyState newState)
+    {
+        if (newState == EnemyState.Flee)
+        {
+            fleeTimer = 0f;
+
+            Vector3 randomDirection = Random.insideUnitSphere * fleeDistance;
+            randomDirection += transform.position;
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(randomDirection, out hit, fleeDistance, NavMesh.AllAreas))
+            {
+                fleeTargetPosition = hit.position;
+                hasFleeTarget = true;
+                agent.isStopped = false;
+                agent.SetDestination(fleeTargetPosition);
+            }
+            else
+            {
+                hasFleeTarget = false;
+                agent.isStopped = true;
+            }
+        }
+    }
+
+    void Flee()
+    {
+        fleeTimer += Time.deltaTime;
+
+        if (fleeTimer >= fleeDuration)
+        {
+            agent.isStopped = true;
+            hasFleeTarget = false;
+            currentState = EnemyState.Idle;
+            return;
+        }
+
+        if (!hasFleeTarget)
+        {
+            agent.isStopped = true;
+            return;
+        }
+
+        if (agent.pathPending)
+            return;
+
+        if (agent.remainingDistance > agent.stoppingDistance)
+        {
+            agent.isStopped = false;
+        }
+        else
+        {
+            agent.isStopped = true;
+            hasFleeTarget = false;
+        }
     }
 
     public void TakeDamage(float damageAmount)
@@ -72,11 +220,14 @@ public class Enemy : MonoBehaviour, IDamageable
         health -= damageAmount;
         animator.SetTrigger("damage");
 
-        if (health <= 0)
+        if (health <= 0f)
         {
             Die();
-            ScoreSystem.Instance.RegisterKill(dieScores);
+            ScoreSystem.Instance?.RegisterKill(dieScores);
+            return;
         }
+
+        isAggroed = true;
     }
 
     void Die()
@@ -86,12 +237,12 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void StartDealDamage()
     {
-        GetComponentInChildren<EnemyDamageDealer>().StartDealDamage();
+        GetComponentInChildren<EnemyDamageDealer>()?.StartDealDamage();
     }
 
     public void EndDealDamage()
     {
-        GetComponentInChildren<EnemyDamageDealer>().EndDealDamage();
+        GetComponentInChildren<EnemyDamageDealer>()?.EndDealDamage();
     }
 
     private void OnDrawGizmos()

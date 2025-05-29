@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,42 +9,40 @@ public class MainMenu : MonoBehaviour
 
     public AudioClip clip;
     public AudioSource musicSource;
-<<<<<<< Updated upstream
-    void Start()
-    {
-        if (slider != null && musicSource != null)
-        {
-            // Установим начальную громкость
-            musicSource.volume = slider.value;
-        }
-    }
-    public void PlayGame()
-    {
-        SceneManager.LoadScene("Demo");
-=======
+
+    [SerializeField] private Button playButton;
+    [SerializeField] private Button loadButton;
+    [SerializeField] private string gameScene = "Demo";
 
     [SerializeField] private PlayerStatsController statsController;
     [SerializeField] private string menuSceneName = "MainMenu";
 
+    void Start()
+    {
+
+    }
 
     void Update()
     {
         Debug.Log(slider.value);
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             SaveAndLoadMenu();
         }
->>>>>>> Stashed changes
     }
 
-    // Update is called once per frame
+    public void PlayGame()
+    {
+        SceneManager.LoadScene(gameScene);
+    }
+
     public void QuitGame()
     {
         Debug.Log("Quit");
         Application.Quit();
     }
 
-<<<<<<< Updated upstream
     public void SetVolume(float value)
     {
         if (musicSource != null)
@@ -52,22 +51,24 @@ public class MainMenu : MonoBehaviour
             Debug.Log("Volume set to: " + value);
         }
     }
-=======
+
     public void OnLoadGame()
     {
         PlayerPrefs.SetInt("LoadFromSave", 1);
         PlayerPrefs.Save();
-        SceneManager.LoadScene("Demo");
+        SceneManager.LoadScene(gameScene);
     }
-
 
     public void OnNewGame()
     {
         PlayerPrefs.SetInt("LoadFromSave", 0);
         PlayerPrefs.DeleteKey("PlayerStats");  
         PlayerPrefs.Save();
-        SceneManager.LoadScene("Demo");
+        SceneManager.LoadScene(gameScene);
     }
 
->>>>>>> Stashed changes
+    private void SaveAndLoadMenu()
+    {
+        Debug.Log("SaveAndLoadMenu called");
+    }
 }

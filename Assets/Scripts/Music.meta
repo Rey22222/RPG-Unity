@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Music.meta
 guid: 90e7b9b0338b05c40a1e2c755d9aa64b
+========
+guid: e705cc1076b0c724e9f5d51025c7582c
+>>>>>>>> 270525:Assets/Elements/Materials.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Character : MonoBehaviour
@@ -44,6 +46,9 @@ public class Character : MonoBehaviour
     [HideInInspector]
     public Vector3 playerVelocity;
 
+    [Header("Game Settings")]
+    public string mainMenuScene = "MainMenu";
+
     private void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -78,12 +83,88 @@ public class Character : MonoBehaviour
     private void Update()
     {
         movementSM.currentState.HandleInput();
-
         movementSM.currentState.LogicUpdate();
+
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            ExitToMenu();
+        }
     }
 
     private void FixedUpdate()
     {
         movementSM.currentState.PhysicsUpdate();
+    }
+
+    private float originalSpeed;
+    private Coroutine slowRoutine;
+    private Coroutine burnRoutine;
+    public HealthSystem healthSystem;
+
+    public void ModifySpeed(float multiplier, float duration)
+    {
+        if (slowRoutine != null) StopCoroutine(slowRoutine);
+        slowRoutine = StartCoroutine(SlowdownRoutine(multiplier, duration));
+    }
+
+    private IEnumerator SlowdownRoutine(float multiplier, float duration)
+    {
+        float speed = originalSpeed;
+        float slowedSpeed = speed * multiplier;
+
+        playerSpeed = slowedSpeed;
+
+        yield return new WaitForSeconds(duration);
+
+        playerSpeed = speed;
+    }
+
+    public void ApplyBurn(float duration, float damagePerSecond)
+    {
+        if (burnRoutine != null) StopCoroutine(burnRoutine);
+        burnRoutine = StartCoroutine(BurnRoutine(duration, damagePerSecond));
+    }
+
+    private IEnumerator BurnRoutine(float duration, float damagePerSecond)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            if (healthSystem != null)
+            {
+                healthSystem.TakeDamage(damagePerSecond);
+            }
+
+            yield return new WaitForSeconds(1f);
+            elapsed += 1f;
+        }
+    }
+
+    public void RunAwayForSeconds(float duration)
+    {
+        StartCoroutine(RunAwayRoutine(duration));
+    }
+
+    private IEnumerator RunAwayRoutine(float duration)
+    {
+        Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
+
+        sprinting.SetRunDirection(randomDirection);
+        movementSM.ChangeState(sprinting);
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            controller.Move(randomDirection * sprintSpeed * Time.deltaTime);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        movementSM.ChangeState(standing);
+    }
+
+    private void ExitToMenu()
+    {
+        SceneManager.LoadScene(mainMenuScene);
     }
 }

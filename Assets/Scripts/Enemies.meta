@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Enemies.meta
 guid: b69d15c5d0a81c34b84f71718f7097b4
+========
+guid: 66983d68354f07b43af832ad21341048
+>>>>>>>> 270525:Assets/Scripts/Elements.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

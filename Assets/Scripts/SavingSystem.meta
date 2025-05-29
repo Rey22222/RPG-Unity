@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/SavingSystem.meta
 guid: 3042fb715f75c194d9ca1f23e4fc0a30
+========
+guid: 66eca371c380b2441a51bdd33f47a7b6
+>>>>>>>> 270525:Assets/Elements/Prefabs.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
