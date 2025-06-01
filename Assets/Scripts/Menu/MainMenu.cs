@@ -17,9 +17,16 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private PlayerStatsController statsController;
     [SerializeField] private string menuSceneName = "MainMenu";
 
+
+    [SerializeField] private Toggle peacefulModeToggle;
+
     void Start()
     {
-
+        if (statsController != null)
+        {
+            bool peacefulMode = statsController.GetPeacefulMode();
+            peacefulModeToggle.isOn = peacefulMode;
+        }
     }
 
     void Update()
@@ -62,7 +69,7 @@ public class MainMenu : MonoBehaviour
     public void OnNewGame()
     {
         PlayerPrefs.SetInt("LoadFromSave", 0);
-        PlayerPrefs.DeleteKey("PlayerStats");  
+        PlayerPrefs.DeleteKey("PlayerStats");
         PlayerPrefs.Save();
         SceneManager.LoadScene(gameScene);
     }
@@ -71,4 +78,15 @@ public class MainMenu : MonoBehaviour
     {
         Debug.Log("SaveAndLoadMenu called");
     }
+
+    public void OnPeacefulModeToggleChanged(bool isOn)
+    {
+        if (statsController != null)
+        {
+            statsController.SetPeacefulMode(isOn);
+            statsController.SaveAll();
+        }
+    }
+
 }
+

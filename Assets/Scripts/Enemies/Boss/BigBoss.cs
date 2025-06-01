@@ -30,14 +30,32 @@ public class BigBoss : MonoBehaviour, IDamageable
 
     private bool hasFled = false;
 
+    public ElementType currentElement;
+    public bool isPeacefulMode;
+    public bool isAggroed;
+
+
+
     void Start()
     {
+        var statsController = FindObjectOfType<PlayerStatsController>();
+        isPeacefulMode = statsController != null && statsController.GetPeacefulMode();
+        isAggroed = !isPeacefulMode;
+
         player = GameObject.FindGameObjectWithTag("Player");
         playerHealth = player.GetComponent<HealthSystem>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         fill = 1f;
-        ChangeState(new IdleStateBigBoss(this));
+
+        if (isAggroed)
+            ChangeState(new AgroStateBigBoss(this));
+        else
+            ChangeState(new IdleStateBigBoss(this));
+
+        currentElement = (ElementType)Random.Range(0, 4);
+        GetComponentInChildren<BossDamageDealer>().SetElement(currentElement);
+
     }
 
     void Update()
@@ -67,6 +85,12 @@ public class BigBoss : MonoBehaviour, IDamageable
     {
         health -= damageAmount;
         animator.SetTrigger("damage");
+
+        if (isPeacefulMode && !isAggroed)
+        {
+            isAggroed = true;
+            ChangeState(new AgroStateBigBoss(this));
+        }
 
         if (health <= 0)
         {

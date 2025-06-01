@@ -18,6 +18,9 @@ public class BossDamageDealer : MonoBehaviour
 
     private int playerLayerMask;
 
+    [SerializeField] private ElementEffects elementEffects;
+    public ElementType currentElement;
+
     void Start()
     {
         playerLayerMask = 1 << 8;
@@ -60,21 +63,29 @@ public class BossDamageDealer : MonoBehaviour
     {
         canSwipe = true;
         hasSwiped = false;
+
+        elementEffects.currentElement = currentElement;
+        elementEffects.PlayElementEffect("Swipe");
+
     }
 
     public void EndSwiping()
     {
         canSwipe = false;
+        elementEffects.DisableAllEffects();
     }
 
     public void StartRoar()
     {
         isRoaring = true;
+        elementEffects.currentElement = currentElement;
+        elementEffects.PlayElementEffect("Roar");
+
     }
 
     public void EndRoar()
     {
-
+        elementEffects.DisableAllEffects();
     }
 
     private void OnDrawGizmos()
@@ -88,5 +99,9 @@ public class BossDamageDealer : MonoBehaviour
             Gizmos.DrawWireSphere(roarOrigin.position, roarRadius);
         }
     }
-}
 
+    public void SetElement(ElementType element)
+    {
+        currentElement = element;
+    }
+}

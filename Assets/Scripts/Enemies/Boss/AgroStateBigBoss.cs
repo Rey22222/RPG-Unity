@@ -1,6 +1,9 @@
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
+using Unity.IO.LowLevel.Unsafe;
+using UnityEngine;
+
 public class AgroStateBigBoss : IEnemyState
 {
     private BigBoss enemy;
@@ -19,6 +22,12 @@ public class AgroStateBigBoss : IEnemyState
 
     public void Update()
     {
+
+        if (enemy.isPeacefulMode && !enemy.isAggroed)
+        {
+            enemy.ChangeState(new IdleStateBigBoss(enemy));
+            return;
+        }
         float distance = Vector3.Distance(enemy.transform.position, enemy.player.transform.position);
 
         if (distance > enemy.aggroRange)
@@ -32,11 +41,11 @@ public class AgroStateBigBoss : IEnemyState
         }
         else
         {
-            if (enemy.health <= enemy.maxHealth/2)
+            if (enemy.health <= enemy.maxHealth / 2)
             {
                 enemy.attackRange = 5f;
                 isHit = true;
-                
+
             }
             if (isHit && (distance <= enemy.attackRange))
             {
@@ -48,7 +57,7 @@ public class AgroStateBigBoss : IEnemyState
                 enemy.ChangeState(new FirstAttackStateBigBoss(enemy));
                 return;
             }
-            
+
         }
 
         newDestinationCD -= Time.deltaTime;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerStatsController : MonoBehaviour
 {
-  
+
     private PlayerStats _stats;
     private SavePlayerStatsInteractor _saveInteractor;
     private LoadPlayerStatsInteractor _loadInteractor;
@@ -10,7 +10,7 @@ public class PlayerStatsController : MonoBehaviour
 
     private void Awake()
     {
-         repository = new PlayerPrefsRepository();
+        repository = new PlayerPrefsRepository();
         _saveInteractor = new SavePlayerStatsInteractor(repository);
         _loadInteractor = new LoadPlayerStatsInteractor(repository);
 
@@ -19,7 +19,7 @@ public class PlayerStatsController : MonoBehaviour
         {
             _stats = _loadInteractor.Execute();
 
-           
+
         }
         else
         {
@@ -29,22 +29,20 @@ public class PlayerStatsController : MonoBehaviour
     }
     private void Start()
     {
+        int loadFromSave = PlayerPrefs.GetInt("LoadFromSave", 0);
+
         if (_stats != null)
         {
-            transform.position = _stats.GetPosition();
-            Debug.Log($"Set player position in Start: {transform.position}");
+            LoadFromSave();
+
         }
-        int loadFromSave = PlayerPrefs.GetInt("LoadFromSave", 0);
+
         if (loadFromSave == 1)
         {
-            LoadFromSave();
-            PlayerPrefs.SetInt("LoadFromSave", 0); 
-        }
-        else
-        {
-            _stats = CreateNewStats();
+            PlayerPrefs.SetInt("LoadFromSave", 0);
         }
     }
+
 
 
     private PlayerStats CreateNewStats()
@@ -66,6 +64,7 @@ public class PlayerStatsController : MonoBehaviour
             if (controller != null) controller.enabled = false;
 
             player.transform.position = pos;
+            _stats.Score = loadedStats.Score;
 
             if (controller != null) controller.enabled = true;
         }
@@ -77,8 +76,8 @@ public class PlayerStatsController : MonoBehaviour
     {
         if (_stats == null)
         {
-            
-            return 200; 
+
+            return 200;
         }
 
         return _stats.CurrentHP;
@@ -132,6 +131,37 @@ public class PlayerStatsController : MonoBehaviour
     public void SetCurrentHP(float hp)
     {
         _stats.CurrentHP = hp;
+    }
+
+    public void AddScore(float points)
+    {
+        if (_stats != null)
+            _stats.Score += points;
+    }
+
+    public float GetScore()
+    {
+        return _stats?.Score ?? 0f;
+    }
+
+    public void SetScore(float score)
+    {
+        if (_stats != null)
+            _stats.Score = score;
+    }
+
+    public bool GetPeacefulMode()
+    {
+        if (_stats == null) return false;
+        return _stats.IsPeacefulMode;
+    }
+
+    public void SetPeacefulMode(bool value)
+    {
+        if (_stats != null)
+        {
+            _stats.IsPeacefulMode = value;
+        }
     }
 
 

@@ -8,6 +8,8 @@ public class HealthSystem : MonoBehaviour
 {
     public bool IsDead { get; private set; } = false;
     [SerializeField] float health = 200;
+    public float CurrentHealth => health;
+
     [SerializeField] GameObject restartMenu;
     public TMP_Text healthText;
 
@@ -19,6 +21,10 @@ public class HealthSystem : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
+        if (statsController != null)
+        {
+            health = statsController.GetCurrentHP();
+        }
     }
 
     void Update()

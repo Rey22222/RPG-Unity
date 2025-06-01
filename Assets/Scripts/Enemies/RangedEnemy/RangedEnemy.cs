@@ -15,6 +15,8 @@ public class RangedEnemy : MonoBehaviour, IDamageable
     public float aggroRange = 15f;
     bool isAttacking;
     public float dieScores = 10f;
+    [SerializeField] private ElementType elementType;
+    [SerializeField] private GameObject projectileEffect;
 
     [Header("Projectile")]
     public GameObject projectilePrefab;
@@ -101,7 +103,7 @@ public class RangedEnemy : MonoBehaviour, IDamageable
 
         Vector3 direction = (player.transform.position - projectileSpawnPoint.position).normalized;
         GameObject proj = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.LookRotation(direction));
-        proj.GetComponent<Projectile>().Initialize(direction);
+        proj.GetComponent<Projectile>().Initialize(direction, elementType, projectileEffect);
     }
     public void EndAttack()
     {
