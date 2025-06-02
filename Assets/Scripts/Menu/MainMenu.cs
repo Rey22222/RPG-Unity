@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -6,36 +5,34 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour
 {
     public Slider slider;
-
-    public AudioClip clip;
     public AudioSource musicSource;
+    public AudioClip clip;
 
     [SerializeField] private Button playButton;
     [SerializeField] private Button loadButton;
-    [SerializeField] private string gameScene = "Demo";
+    [SerializeField] private Toggle peacefulModeToggle;
 
+    [SerializeField] private string gameScene = "Demo";
     [SerializeField] private PlayerStatsController statsController;
-    [SerializeField] private string menuSceneName = "MainMenu";
 
     void Start()
     {
-
+        if (statsController != null)
+        {
+            bool peacefulMode = statsController.GetPeacefulMode();
+            peacefulModeToggle.isOn = peacefulMode;
+        }
     }
 
     void Update()
     {
-        Debug.Log(slider.value);
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            SaveAndLoadMenu();
+            Debug.Log("SaveAndLoadMenu called");
         }
     }
 
-    public void PlayGame()
-    {
-        SceneManager.LoadScene(gameScene);
-    }
+    public void PlayGame() => SceneManager.LoadScene(gameScene);
 
     public void QuitGame()
     {
@@ -62,13 +59,15 @@ public class MainMenu : MonoBehaviour
     public void OnNewGame()
     {
         PlayerPrefs.SetInt("LoadFromSave", 0);
-        PlayerPrefs.DeleteKey("PlayerStats");  
+        PlayerPrefs.DeleteKey("PlayerStats");
         PlayerPrefs.Save();
         SceneManager.LoadScene(gameScene);
     }
 
-    private void SaveAndLoadMenu()
+    public void OnPeacefulModeToggleChanged(bool isOn)
     {
-        Debug.Log("SaveAndLoadMenu called");
+        PlayerPrefs.SetInt("PeacefulMode", isOn ? 1 : 0);
+        PlayerPrefs.Save();
+        Debug.Log("Saved PeacefulMode = " + isOn);
     }
 }

@@ -49,6 +49,8 @@ public class Character : MonoBehaviour
     [Header("Game Settings")]
     public string mainMenuScene = "MainMenu";
 
+    private PlayerStatsController statsController;
+
     private void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -68,17 +70,22 @@ public class Character : MonoBehaviour
 
         normalColliderHeight = controller.height;
         gravityValue *= gravityMultiplier;
-<<<<<<< Updated upstream
-=======
-
         statsController = GetComponent<PlayerStatsController>();
         if (statsController == null)
         {
-            Debug.LogError("GamePauseManager: PlayerStatsController not found!");
+            Debug.LogError("Character: PlayerStatsController not found!");
         }
 
->>>>>>> Stashed changes
+        if (healthSystem == null)
+        {
+            healthSystem = GetComponent<HealthSystem>();
+            if (healthSystem == null)
+            {
+                Debug.LogError("Character: HealthSystem not found!");
+            }
+        }
     }
+
 
     private void Update()
     {
@@ -165,6 +172,12 @@ public class Character : MonoBehaviour
 
     private void ExitToMenu()
     {
+        if (statsController != null)
+        {
+            statsController.SetCurrentHP(healthSystem.CurrentHealth);
+
+            statsController.SaveAll();
+        }
         SceneManager.LoadScene(mainMenuScene);
     }
 }

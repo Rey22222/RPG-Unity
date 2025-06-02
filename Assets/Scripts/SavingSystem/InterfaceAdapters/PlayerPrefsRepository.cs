@@ -11,7 +11,7 @@ public class PlayerPrefsRepository : IPlayerStatsRepository
 
         if (string.IsNullOrEmpty(json) || json == "{}")
         {
-           
+
             return new PlayerStats(200, 50, 5f, 8f, new Vector3(0, 0, 0));
         }
 
