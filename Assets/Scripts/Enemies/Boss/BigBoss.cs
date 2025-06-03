@@ -5,8 +5,8 @@ using UnityEngine.UI;
 public class BigBoss : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
-    public float health = 15;
-    public float maxHealth = 15;
+    public float health = 15f;
+    public float maxHealth = 15f;
 
     [Header("Combat")]
     public float attackCD = 3f;
@@ -16,8 +16,6 @@ public class BigBoss : MonoBehaviour, IDamageable
 
     [Header("UI")]
     public Image Bar;
-    public float fill;
-    public bool IsFleeing => hasFled;
 
     [HideInInspector] public GameObject player;
     [HideInInspector] public HealthSystem playerHealth;
@@ -25,24 +23,37 @@ public class BigBoss : MonoBehaviour, IDamageable
     [HideInInspector] public Animator animator;
 
     private IEnemyState currentState;
-    public float attackTimer;
-    public float destinationTimer;
-
     private bool hasFled = false;
+
+    public ElementType currentElement;
+    public bool isPeacefulMode;
+    public bool isAggroed;
 
     void Start()
     {
+        isPeacefulMode = PlayerPrefs.GetInt("PeacefulMode", 0) == 1;
+        isAggroed = !isPeacefulMode;
+
         player = GameObject.FindGameObjectWithTag("Player");
         playerHealth = player.GetComponent<HealthSystem>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        fill = 1f;
-        ChangeState(new IdleStateBigBoss(this));
+
+        currentElement = (ElementType)Random.Range(0, 4);
+        GetComponentInChildren<BossDamageDealer>().SetElement(currentElement);
+
+        ChangeState(isAggroed ? new AgroStateBigBoss(this) : new IdleStateBigBoss(this));
     }
 
     void Update()
     {
-        Bar.fillAmount = health / maxHealth;
+   
+        var statsController = FindObjectOfType<PlayerStatsController>();
+        if (statsController != null)
+        {
+            isPeacefulMode = statsController.GetPeacefulMode();
+        }
+
         if (player == null || playerHealth == null || playerHealth.IsDead)
         {
             agent.isStopped = true;
@@ -50,10 +61,8 @@ public class BigBoss : MonoBehaviour, IDamageable
             return;
         }
 
-        animator.SetFloat("speed", agent.velocity.magnitude / agent.speed);
-
+        Bar.fillAmount = health / maxHealth;
         currentState?.Update();
-        Debug.Log(currentState);
     }
 
     public void ChangeState(IEnemyState newState)
@@ -68,6 +77,12 @@ public class BigBoss : MonoBehaviour, IDamageable
         health -= damageAmount;
         animator.SetTrigger("damage");
 
+        if (isPeacefulMode && !isAggroed)
+        {
+            isAggroed = true;
+            ChangeState(new AgroStateBigBoss(this));
+        }
+
         if (health <= 0)
         {
             Die();
@@ -75,29 +90,19 @@ public class BigBoss : MonoBehaviour, IDamageable
         }
     }
 
-    void Die()
+    private void Die()
     {
         Destroy(gameObject);
     }
 
-    public void StartRoar()
-    {
-        GetComponentInChildren<BossDamageDealer>().StartRoar();
-    }
+    // Для атак
+    public void StartRoar() => GetComponentInChildren<BossDamageDealer>().StartRoar();
+    public void EndRoar() => GetComponentInChildren<BossDamageDealer>().EndRoar();
+    public void StartSwiping() => GetComponentInChildren<BossDamageDealer>().StartSwiping();
+    public void EndSwiping() => GetComponentInChildren<BossDamageDealer>().EndSwiping();
 
-    public void EndRoar()
-    {
-        GetComponentInChildren<BossDamageDealer>().EndRoar();
-    }
-    public void StartSwiping()
-    {
-        GetComponentInChildren<BossDamageDealer>().StartSwiping();
-    }
+    public bool IsFleeing => hasFled;
 
-    public void EndSwiping()
-    {
-        GetComponentInChildren<BossDamageDealer>().EndSwiping();
-    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
