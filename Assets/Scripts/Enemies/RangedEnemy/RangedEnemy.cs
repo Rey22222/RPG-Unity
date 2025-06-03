@@ -15,6 +15,8 @@ public class RangedEnemy : MonoBehaviour, IDamageable
     public float aggroRange = 15f;
     bool isAttacking;
     public float dieScores = 10f;
+    [SerializeField] private ElementType elementType;
+    [SerializeField] private GameObject projectileEffect;
 
     [Header("Projectile")]
     public GameObject projectilePrefab;
@@ -33,20 +35,23 @@ public class RangedEnemy : MonoBehaviour, IDamageable
 
     public bool IsFleeing => hasFled;
     private bool hasFled = false;
-
+    private PlayerStatsController statsController;
     void Start()
     {
         player = GameObject.FindWithTag("Player");
         playerHealth = player.GetComponent<HealthSystem>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        statsController = FindObjectOfType<PlayerStatsController>();
         fill = 1f;
         ChangeState(new IdleStateRangedEnemy(this));
+
     }
 
     void Update()
     {
         Bar.fillAmount = health / maxHealth;
+
         if (player == null || playerHealth == null || playerHealth.IsDead)
         {
             agent.isStopped = true;
@@ -56,6 +61,23 @@ public class RangedEnemy : MonoBehaviour, IDamageable
 
         animator.SetFloat("speed", agent.velocity.magnitude / agent.speed);
 
+    
+        if (statsController != null && statsController.GetPeacefulMode())
+        {
+            if (!hasFled && health < maxHealth / 2f)
+            {
+                hasFled = true;
+                ChangeState(new FleeStateRangedEnemy(this));
+            }
+            else if (!hasFled)
+            {
+                ChangeState(new IdleStateRangedEnemy(this)); 
+            }
+
+            return; 
+        }
+
+       
         if (!hasFled && health < maxHealth / 2f)
         {
             hasFled = true;
@@ -101,7 +123,7 @@ public class RangedEnemy : MonoBehaviour, IDamageable
 
         Vector3 direction = (player.transform.position - projectileSpawnPoint.position).normalized;
         GameObject proj = Instantiate(projectilePrefab, projectileSpawnPoint.position, Quaternion.LookRotation(direction));
-        proj.GetComponent<Projectile>().Initialize(direction);
+        proj.GetComponent<Projectile>().Initialize(direction, elementType, projectileEffect);
     }
     public void EndAttack()
     {
