@@ -16,8 +16,6 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private PlayerStatsController statsController;
 
 
-    [SerializeField] private Toggle peacefulModeToggle;
-
     void Start()
     {
         if (statsController != null)
@@ -67,13 +65,7 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(gameScene);
     }
 
-    public void OnPeacefulModeToggleChanged(bool isOn)
-    {
-        PlayerPrefs.SetInt("PeacefulMode", isOn ? 1 : 0);
-        PlayerPrefs.Save();
-        Debug.Log("Saved PeacefulMode = " + isOn);
-    }
-
+    
     public void OnPeacefulModeToggleChanged(bool isOn)
     {
         if (statsController != null)
