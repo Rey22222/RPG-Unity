@@ -29,13 +29,14 @@ public class YellingEnemy : MonoBehaviour, IDamageable
     public float destinationTimer;
 
     private bool hasFled = false;
-
+    private PlayerStatsController statsController;
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         playerHealth = player.GetComponent<HealthSystem>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        statsController = FindObjectOfType<PlayerStatsController>();
         fill = 1f;
         ChangeState(new IdleStateYellingEnemy(this));
     }
@@ -43,6 +44,7 @@ public class YellingEnemy : MonoBehaviour, IDamageable
     void Update()
     {
         Bar.fillAmount = health / maxHealth;
+
         if (player == null || playerHealth == null || playerHealth.IsDead)
         {
             agent.isStopped = true;
@@ -51,6 +53,24 @@ public class YellingEnemy : MonoBehaviour, IDamageable
         }
 
         animator.SetFloat("speed", agent.velocity.magnitude / agent.speed);
+
+       
+        if (statsController != null && statsController.GetPeacefulMode())
+        {
+            if (!hasFled && health < maxHealth / 2f)
+            {
+                hasFled = true;
+                ChangeState(new FleeStateYellingEnemy(this)); 
+            }
+            else if (!hasFled)
+            {
+                ChangeState(new IdleStateYellingEnemy(this)); 
+            }
+
+            return;
+        }
+
+       
         if (!hasFled && health < maxHealth / 2f)
         {
             hasFled = true;
@@ -58,7 +78,6 @@ public class YellingEnemy : MonoBehaviour, IDamageable
         }
 
         currentState?.Update();
-        Debug.Log(currentState);
     }
 
     public void ChangeState(IEnemyState newState)

@@ -11,10 +11,12 @@ public class PlayerStats
 
     public float PlayerSpeed { get; set; }
     public float SprintSpeed { get; set; }
+    public float Score { get; set; }
 
+    public bool IsPeacefulMode { get; set; }
     public PlayerStats() { }
     [System.Serializable]
-    public class SerializableVector3 
+    public class SerializableVector3
     {
         public float x;
         public float y;
@@ -35,7 +37,7 @@ public class PlayerStats
         }
     }
 
-    public SerializableVector3 Position { get;  set; }
+    public SerializableVector3 Position { get; set; }
 
     public PlayerStats(float maxHP, float maxMP, float playerSpeed, float sprintSpeed, Vector3 startPosition)
     {
@@ -49,6 +51,10 @@ public class PlayerStats
         SprintSpeed = sprintSpeed;
 
         Position = new SerializableVector3(startPosition);
+
+        Score = 0f;
+        IsPeacefulMode = false;
+
     }
 
     public void SetPosition(Vector3 position)

@@ -3,7 +3,16 @@ guid: 2ef37554e69621945b80fb1b14919605
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - iceEffect: {fileID: 5233430197803778761, guid: 5cbb5fbbc5994014a8f3b1d19d736930, type: 3}
+  - fireEffect: {fileID: 3491544436505902767, guid: ee5fb1ab0d5e79a408810fb93ded20b3, type: 3}
+  - earthEffect: {fileID: 8710556210361674360, guid: dc2e0b9656581c445b501ab024919238, type: 3}
+  - windEffect: {fileID: 4684228818322374713, guid: d8d945b4b75f255429d2198e30f18c60, type: 3}
+  - playerMovement: {instanceID: 0}
+  - audioSource: {instanceID: 0}
+  - iceSound: {fileID: 8300000, guid: 43afcca28d7cde148a1e1f4eb9fe8e73, type: 3}
+  - fireSound: {fileID: 8300000, guid: 688c6e174c2a1f94ab8da9bd05c5c6b5, type: 3}
+  - earthSound: {fileID: 8300000, guid: 6ec6de5f4fa7112498f708d921312d38, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

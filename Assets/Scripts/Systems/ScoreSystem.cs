@@ -21,8 +21,18 @@ public class ScoreSystem : MonoBehaviour
     private bool bossSpawned = false;
     private bool victoryPlayed = false;
 
+    void Start()
+    {
+        var statsController = PlayerStatsControllerInstance();
+        score = statsController.GetScore();
+        if (scoreText != null)
+            scoreText.text = $"Score: {score}";
+    }
+
+
     void Awake()
     {
+       
         if (Instance == null)
             Instance = this;
         else
@@ -36,6 +46,10 @@ public class ScoreSystem : MonoBehaviour
 
         if (scoreText != null)
             scoreText.text = $"Score: {score}";
+
+        var statsController = PlayerStatsControllerInstance();
+        statsController.SetScore(score);
+        statsController.SaveAll();
 
         if (!bossSpawned && killCount >= killsToSpawnBoss)
             SpawnBoss();
@@ -71,5 +85,11 @@ public class ScoreSystem : MonoBehaviour
             Debug.LogWarning("Victory music or AudioSource not set!");
         }
     }
+
+    private PlayerStatsController PlayerStatsControllerInstance()
+    {
+        return FindObjectOfType<PlayerStatsController>();
+    }
+
 }
 
